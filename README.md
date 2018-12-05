@@ -1,0 +1,3 @@
+# NumLock
+高仿苹果数字解锁页面swift版
+适配使用的snapkit，NumLockViewController和NumLockCollectionViewCell为主要的2个文件其他东西自己改改就能用
