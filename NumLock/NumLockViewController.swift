@@ -20,13 +20,19 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
     var pointStr = ""
     
     let letterArr = ["","ABC","DEF","GHI","JKL","MNO","PQRS","TUV","WXYZ"]
-    
+    var chainCode = ""
+    var ordersId = ""
+    //
+    var type :Int! = 0
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor.init(red: 0, green: 0, blue: 0, alpha: 0.3)
+        self.view.backgroundColor = UIColor.init(red: 25/255, green: 28/255, blue: 35/255, alpha: 1.0)
         initHeader()
         initNumLockKeyboard()
         // Do any additional setup after loading the view.
+    }
+    @objc func backClicked(){
+        self.navigationController?.popViewController(animated: true)
     }
     func initHeader(){
         let name = UILabel()
@@ -76,7 +82,7 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         point2.setImage(UIImage.init(named: "circle"), for: .normal)
         point2.imageEdgeInsets = UIEdgeInsets(top: 2.5, left: 2.5, bottom: 2.5, right: 2.5)
         point2.titleLabel?.font = UIFont.systemFont(ofSize: 30)
-        point1.tag = 1
+        point2.tag = 1
         pointView.addSubview(point2)
         point2.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
@@ -87,7 +93,7 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         point3.setImage(UIImage.init(named: "circle"), for: .normal)
         point3.imageEdgeInsets = UIEdgeInsets(top: 2.5, left: 2.5, bottom: 2.5, right: 2.5)
         point3.titleLabel?.font = UIFont.systemFont(ofSize: 30)
-        point1.tag = 2
+        point3.tag = 2
         pointView.addSubview(point3)
         point3.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
@@ -98,7 +104,7 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         point4.setImage(UIImage.init(named: "circle"), for: .normal)
         point4.imageEdgeInsets = UIEdgeInsets(top: 2.5, left: 2.5, bottom: 2.5, right: 2.5)
         point4.titleLabel?.font = UIFont.systemFont(ofSize: 30)
-        point1.tag = 3
+        point4.tag = 3
         pointView.addSubview(point4)
         point4.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
@@ -109,7 +115,7 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         point5.setImage(UIImage.init(named: "circle"), for: .normal)
         point5.imageEdgeInsets = UIEdgeInsets(top: 2.5, left: 2.5, bottom: 2.5, right: 2.5)
         point5.titleLabel?.font = UIFont.systemFont(ofSize: 30)
-        point1.tag = 4
+        point5.tag = 4
         pointView.addSubview(point5)
         point5.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
@@ -120,7 +126,7 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         point6.setImage(UIImage.init(named: "circle"), for: .normal)
         point6.imageEdgeInsets = UIEdgeInsets(top: 2.5, left: 2.5, bottom: 2.5, right: 2.5)
         point6.titleLabel?.font = UIFont.systemFont(ofSize: 30)
-        point1.tag = 5
+        point6.tag = 5
         pointView.addSubview(point6)
         point6.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
@@ -136,7 +142,7 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         let collection = UICollectionView.init(frame: CGRect(x: 0, y: 200, width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height-200), collectionViewLayout: flowLayout)
         collection.register(NumLockCollectionViewCell.classForCoder(), forCellWithReuseIdentifier: "NumLockCollectionViewCell")
         collection.dataSource = self
-        collection.backgroundColor = UIColor.init(red: 0, green: 0, blue: 0, alpha: 0.3)
+        collection.backgroundColor = UIColor.init(red: 25/255, green: 28/255, blue: 35/255, alpha: 1.0)
         self.view.addSubview(collection)
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -146,21 +152,63 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NumLockCollectionViewCell", for: indexPath) as? NumLockCollectionViewCell
         if indexPath.row < 9 {
-            cell!.isHidden = false
             cell?.createView(number: "\(indexPath.row+1)", letters: letterArr[indexPath.row])
             cell?.btn.tag = indexPath.row + 1
             cell?.btn.addTarget(self, action: #selector(NumLockViewController.btnClicked(btn:)), for: .touchUpInside)
         }else if indexPath.row == 9 {
-            cell!.isHidden = true
+            cell?.createView(number: "", letters: "")
+            cell?.btn.backgroundColor = UIColor.clear
             //这里可以加自己的按钮
+            //清空
+            let clearImage = UIImageView()
+            clearImage.image = UIImage.init(named: "clean")
+            cell?.contentView.addSubview(clearImage)
+            clearImage.snp.makeConstraints { (make) in
+                make.centerX.equalToSuperview()
+                make.top.equalToSuperview().offset(13)
+                make.height.width.equalTo(23)
+            }
+            let clearLabel = UILabel()
+            clearLabel.textColor = UIColor.white
+            clearLabel.text = "清空"
+            clearLabel.font = UIFont.systemFont(ofSize: 12)
+            clearLabel.textAlignment = .center
+            cell?.contentView.addSubview(clearLabel)
+            clearLabel.snp.makeConstraints { (make) in
+                make.left.right.equalToSuperview()
+                make.top.equalTo(clearImage.snp.bottom).offset(5)
+                make.height.equalTo(15)
+            }
+            cell?.btn.addTarget(self, action: #selector(NumLockViewController.cleanClicked), for: .touchUpInside)
         }else if indexPath.row == 10 {
-            cell!.isHidden = false
             cell?.createView(number: "0", letters: "")
             cell?.btn.tag = 0
             cell?.btn.addTarget(self, action: #selector(NumLockViewController.btnClicked(btn:)), for: .touchUpInside)
         }else if indexPath.row == 11 {
-            cell!.isHidden = true
+            cell?.createView(number: "", letters: "")
+            cell?.btn.backgroundColor = UIColor.clear
             //这里可以加自己的按钮
+            //清空
+            let clearImage = UIImageView()
+            clearImage.image = UIImage.init(named: "delete")
+            cell?.contentView.addSubview(clearImage)
+            clearImage.snp.makeConstraints { (make) in
+                make.centerX.equalToSuperview()
+                make.top.equalToSuperview().offset(13)
+                make.height.width.equalTo(23)
+            }
+            let clearLabel = UILabel()
+            clearLabel.textColor = UIColor.white
+            clearLabel.text = "删除"
+            clearLabel.font = UIFont.systemFont(ofSize: 12)
+            clearLabel.textAlignment = .center
+            cell?.contentView.addSubview(clearLabel)
+            clearLabel.snp.makeConstraints { (make) in
+                make.left.right.equalToSuperview()
+                make.top.equalTo(clearImage.snp.bottom).offset(5)
+                make.height.equalTo(15)
+            }
+            cell?.btn.addTarget(self, action: #selector(NumLockViewController.deleteClicked), for: .touchUpInside)
         }
         return cell!
     }
@@ -184,13 +232,21 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         }else if pointStr.count == 6 {
             point6.setImage(nil, for: .normal)
             point6.setTitle("\(btn.tag)", for: .normal)
-            print(pointStr)
             //输入不对时抖动动画
-            if pointStr != "123456" {
-                self.startShake()
-                pointStr = ""
-                changeBtnState()
-            }
+            self.startShake()
+            pointStr = ""
+            changeBtnState()
+        }
+    }
+    @objc func cleanClicked(){
+        pointStr = ""
+        changeBtnState()
+    }
+    @objc func deleteClicked(){
+        if pointStr.count > 0 {
+            pointStr = String(pointStr[pointStr.startIndex..<pointStr.index(pointStr.endIndex, offsetBy: -1)])
+            print(pointStr,pointStr.count)
+            changeBtnState()
         }
     }
     //根据字符串长度改变按钮状态
@@ -214,13 +270,13 @@ class NumLockViewController: UIViewController,UICollectionViewDataSource,UIColle
         pointView.layer.add(animation, forKey: "shake")
     }
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destination.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
 }
